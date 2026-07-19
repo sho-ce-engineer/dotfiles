@@ -1,0 +1,7 @@
+# HomeBrew
+Brewfile.lock.json
+
+# Git
+git/.config/git/**/*
+!git/.config/git/config
+!git/.config/git/ignore
