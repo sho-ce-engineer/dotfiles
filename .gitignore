@@ -5,3 +5,6 @@ Brewfile.lock.json
 git/.config/git/**/*
 !git/.config/git/config
 !git/.config/git/ignore
+
+# Mac
+.DS_Store

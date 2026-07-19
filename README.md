@@ -1,4 +1,4 @@
-#dotfiles
+# dotfiles
 
 ## setup instructions
 ```sh
@@ -6,9 +6,12 @@
 git clone リンク ~/dotfiles
 cd ~/dotfiles
 
-# Setup system preferences, Install packages, Deploy dotfiles
+# Run minimal configuration (Setup system preferences, Install core packages, Deploy dotfiles)
 make
 
-# Refresh shell
+# Run work configuration (Install additional applications for work)
+make work
+
+# Refresh shell environment
 exec -l $SHELL
 ```

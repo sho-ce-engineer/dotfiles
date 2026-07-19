@@ -9,6 +9,11 @@ brew "mise"
 
 # Applications
 cask "ghostty"
+cask "1password", args: { appdir: "/Applications" }
+cask "brave-browser"
+cask "visual-studio-code"
+cask "obsidian"
 
 # Fonts
 cask "font-hackgen-nerd"
+cask "font-aoboshi-one"
