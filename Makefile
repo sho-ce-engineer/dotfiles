@@ -7,7 +7,7 @@ STOW_PACKAGES := $(patsubst %/,%,$(wildcard */))
 # 📦 Target Management
 # ==============================================================================
 # Targets to exclude from the automatic setup execution (default `make` command)
-EXCLUDE_TARGETS := all work brew-work defaults
+EXCLUDE_TARGETS := all work brew-work setup-signing defaults
 
 # Convert the space-separated list into a regex pattern (e.g., all|work|brew-work)
 EXCLUDE_REGEX := $(shell echo "$(EXCLUDE_TARGETS)" | sed 's/ /|/g')
@@ -66,6 +66,22 @@ mise: brew
 		mise install -y; \
 	else \
 		echo "⚙️ mise is not installed. Please ensure 'mise' is in your Brewfile."; \
+	fi
+
+# GitHub Verified Settings.
+# 新PCでも安全かつ完全自動でコミット署名環境を構築する
+setup-signing:
+	@if [ ! -f ~/.ssh/github_sign ]; then \
+		echo "🔑 GitHub CLIの署名鍵登録権限を確認/更新します..."; \
+		gh auth refresh -h github.com -s admin:ssh_signing_key; \
+		echo "🔑 Generating new SSH signing key..."; \
+		mkdir -p ~/.ssh && chmod 700 ~/.ssh; \
+		ssh-keygen -t ed25519 -C "293084588+sho-ce-engineer@users.noreply.github.com" -f ~/.ssh/github_sign -N ""; \
+		echo "🚀 Adding key to GitHub..."; \
+		gh ssh-key add ~/.ssh/github_sign.pub --type signing; \
+		echo "✅ 署名鍵の生成とGitHubへの登録が完了しました！"; \
+	else \
+		echo "✅ Signing key already exists."; \
 	fi
 
 defaults:

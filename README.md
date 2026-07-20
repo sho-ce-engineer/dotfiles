@@ -19,3 +19,10 @@ exec -l $SHELL
 make defaults
 
 ```
+
+## GitHub Verified Setting.
+初回`make`後に下記コマンドを実行することで、Verified環境を付与することができる。
+
+```sh
+make setup-signing
+```
