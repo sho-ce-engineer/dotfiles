@@ -14,4 +14,8 @@ make work
 
 # Refresh shell environment
 exec -l $SHELL
+
+# Run defaults
+make defaults
+
 ```
