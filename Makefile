@@ -17,7 +17,6 @@ SETUP_TARGETS := $(shell awk -F':' -v exclude="^($(EXCLUDE_REGEX))$$" '/^[a-z0-9
 DEFAULTS_TARGETS := $(shell awk -F':' '/^defaults-[a-z0-9_-]+:/ {print $$1}' $(MAKEFILE_LIST))
 # ==============================================================================
 
-.ONESHELL:
 .PHONY: $(shell cat $(MAKEFILE_LIST) | awk -F':' '/^[a-z0-9_-]+:/ {print $$1}')
 
 # [Minimal Configuration] Executed when running `make` or `make all`
@@ -69,20 +68,48 @@ mise: brew
 	fi
 
 # GitHub Verified Settings.
-# 新PCでも安全かつ完全自動でコミット署名環境を構築する
 setup-signing:
+	@STATUS=$$(gh auth status -h github.com 2>&1 || true); \
+	if echo "$$STATUS" | grep -q "write:ssh_signing_key" && echo "$$STATUS" | grep -q "write:public_key"; then \
+		: ; \
+	elif echo "$$STATUS" | grep -q "Logged in to"; then \
+		gh auth refresh -h github.com -s write:ssh_signing_key,write:public_key; \
+	else \
+		gh auth login -h github.com -s write:ssh_signing_key,write:public_key; \
+	fi
 	@if [ ! -f ~/.ssh/github_sign ]; then \
-		echo "🔑 GitHub CLIの署名鍵登録権限を確認/更新します..."; \
-		gh auth refresh -h github.com -s admin:ssh_signing_key; \
 		echo "🔑 Generating new SSH signing key..."; \
 		mkdir -p ~/.ssh && chmod 700 ~/.ssh; \
 		ssh-keygen -t ed25519 -C "293084588+sho-ce-engineer@users.noreply.github.com" -f ~/.ssh/github_sign -N ""; \
 		echo "🚀 Adding key to GitHub..."; \
-		gh ssh-key add ~/.ssh/github_sign.pub --type signing; \
+		gh ssh-key add ~/.ssh/github_sign.pub --type signing -t "Mac-Signing-Key"; \
 		echo "✅ 署名鍵の生成とGitHubへの登録が完了しました！"; \
 	else \
-		echo "✅ Signing key already exists."; \
+		echo "✅ Signing key already exists in local."; \
+		echo "🚀 Ensuring key is added to GitHub..."; \
+		set +e; \
+		ADD_OUTPUT=$$(gh ssh-key add ~/.ssh/github_sign.pub --type signing -t "Mac-Signing-Key" 2>&1); \
+		ADD_STATUS=$$?; \
+		set -e; \
+		if [ $$ADD_STATUS -ne 0 ]; then \
+			if echo "$$ADD_OUTPUT" | grep -qi "already in use"; then \
+				echo "✅ Already registered on GitHub. Skipping."; \
+			else \
+				echo "$$ADD_OUTPUT" >&2; \
+				exit 1; \
+			fi; \
+		else \
+			echo "$$ADD_OUTPUT"; \
+		fi; \
 	fi
+	@echo "⚙️ Gitの署名設定を行います..."
+	@git config --global gpg.format ssh
+	@git config --global user.signingkey "~/.ssh/github_sign.pub"
+	@git config --global commit.gpgsign true
+	@mkdir -p ~/.config/git
+	@echo "$$(git config user.email) $$(cat ~/.ssh/github_sign.pub)" > ~/.config/git/allowed_signers
+	@git config --global gpg.ssh.allowedSignersFile "~/.config/git/allowed_signers"
+	@echo "🎉 すべての設定が完了しました！"
 
 defaults:
 	@echo "Configuring macOS Dock and Hot Corners..."

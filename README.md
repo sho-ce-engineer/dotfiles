@@ -1,6 +1,6 @@
 # dotfiles
 
-## setup instructions
+## STEP1:setup instructions
 ```sh
 # Get this repository
 git clone リンク ~/dotfiles
@@ -20,9 +20,15 @@ make defaults
 
 ```
 
-## GitHub Verified Setting.
-初回`make`後に下記コマンドを実行することで、Verified環境を付与することができる。
+##  STEP2:GitHub Verified Setting.
+初回`make`後に下記コマンドを実行することで、Verified環境を付与する。
+- 新規の場合：ログイン→署名登録
+- 既に登録済みの場合：Skip
 
 ```sh
 make setup-signing
+
+# keyの状態確認
+# Login,Active accountがtrue,Token scopesが一致していればOK
+gh auth status
 ```
