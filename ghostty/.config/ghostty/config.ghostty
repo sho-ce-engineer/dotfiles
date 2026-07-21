@@ -9,7 +9,7 @@ font-feature = -liga
 font-size = 15
 
 # Background
-background-opacity = 0.1
+background-opacity = 0.9
 background-blur = 10
 unfocused-split-opacity = 0.65
 
