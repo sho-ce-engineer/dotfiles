@@ -32,3 +32,9 @@ make setup-signing
 # Login,Active accountがtrue,Token scopesが一致していればOK
 gh auth status
 ```
+---
+## 注意
+cloneする場合、`Makefile`の下記記述はご自身のメールアドレスに変更してください。
+```bash
+	ssh-keygen -t ed25519 -C "メールアドレス" -f ~/.ssh/github_sign -N ""; \
+```
