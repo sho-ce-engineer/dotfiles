@@ -13,7 +13,7 @@ cask "1password", args: { appdir: "/Applications" }
 cask "brave-browser"
 cask "visual-studio-code"
 cask "obsidian"
-cask "karabiner-elements"
+cask "karabiner-elements" # pkgインストーラー形式のため appdir 指定は効かず、常に /Applications 固定
 
 # Fonts
 cask "font-hackgen-nerd"
