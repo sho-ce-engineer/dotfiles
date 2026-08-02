@@ -51,6 +51,10 @@ brew-cleanup:
 # Deploy all dotfile packages with GNU Stow
 dotfiles:
 	mkdir -p ~/.config
+	@if [ -d ~/.config/karabiner ] && [ ! -L ~/.config/karabiner ] && [ ! -e ~/.config/karabiner/karabiner.json ]; then \
+		echo "🧹 Removing empty Karabiner-Elements stub directory created by the installer..."; \
+		rm -rf ~/.config/karabiner; \
+	fi
 	stow -v -t ~ -S $(STOW_PACKAGES)
 
 $(addprefix stow-,$(STOW_PACKAGES)): stow-%:
