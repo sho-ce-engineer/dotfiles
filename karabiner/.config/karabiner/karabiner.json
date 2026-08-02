@@ -1,67 +1,163 @@
 {
-  "profiles": [
-    {
-      "name": "Default profile",
-      "selected": true,
-      "virtual_hid_keyboard": {
-        "keyboard_type_v2": "jis"
-      },
-      "complex_modifications": {
-        "rules": [
-          {
-            "description": "Claude Mac App: Enter for Newline, Cmd+Enter for Submit",
-            "manipulators": [
-              {
-                "type": "basic",
-                "description": "Command + Enter -> Enter (送信)",
-                "from": {
-                  "key_code": "return_or_enter",
-                  "modifiers": {
-                    "mandatory": ["command"]
-                  }
-                },
-                "to": [
-                  {
-                    "key_code": "return_or_enter"
-                  }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_if",
-                    "bundle_identifiers": [
-                      "^com\\.anthropic\\.claudefordesktop$"
-                    ]
-                  }
-                ]
-              },
-              {
-                "type": "basic",
-                "description": "Enter -> Shift + Enter (改行)",
-                "from": {
-                  "key_code": "return_or_enter",
-                  "modifiers": {
-                    "optional": ["any"]
-                  }
-                },
-                "to": [
-                  {
-                    "key_code": "return_or_enter",
-                    "modifiers": ["shift"]
-                  }
-                ],
-                "conditions": [
-                  {
-                    "type": "frontmost_application_if",
-                    "bundle_identifiers": [
-                      "^com\\.anthropic\\.claudefordesktop$"
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    }
-  ]
+	"profiles": [
+		{
+			"complex_modifications": {
+				"rules": [
+					{
+						"description": "Auto-switch to Custom Keyboard profile",
+						"manipulators": [
+							{
+								"conditions": [
+									{
+										"identifiers": [
+											{
+												"product_id": 24672,
+												"vendor_id": 65261,
+												"description": "Forty_Orth"
+											}
+										],
+										"type": "device_if"
+									}
+								],
+								"from": {
+									"any": "key_code",
+									"modifiers": { "optional": ["any"] }
+								},
+								"to": [
+									{
+										"shell_command": "/Library/Application\\ Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli --select-profile 'Custom Keyboard'"
+									},
+									{ "from_event": true }
+								],
+								"type": "basic"
+							}
+						]
+					},
+					{
+						"description": "Claude Mac App: Enter for Newline, Cmd+Enter for Submit",
+						"manipulators": [
+							{
+								"conditions": [
+									{
+										"bundle_identifiers": [
+											"^com\\.anthropic\\.claudefordesktop$"
+										],
+										"type": "frontmost_application_if"
+									}
+								],
+								"description": "Command + Enter -> Enter (送信)",
+								"from": {
+									"key_code": "return_or_enter",
+									"modifiers": { "mandatory": ["command"] }
+								},
+								"to": [{ "key_code": "return_or_enter" }],
+								"type": "basic"
+							},
+							{
+								"conditions": [
+									{
+										"bundle_identifiers": [
+											"^com\\.anthropic\\.claudefordesktop$"
+										],
+										"type": "frontmost_application_if"
+									}
+								],
+								"description": "Enter -> Shift + Enter (改行)",
+								"from": {
+									"key_code": "return_or_enter",
+									"modifiers": { "optional": ["any"] }
+								},
+								"to": [
+									{
+										"key_code": "return_or_enter",
+										"modifiers": ["shift"]
+									}
+								],
+								"type": "basic"
+							}
+						]
+					}
+				]
+			},
+			"name": "Default profile",
+			"virtual_hid_keyboard": { "keyboard_type_v2": "jis" }
+		},
+		{
+			"complex_modifications": {
+				"rules": [
+					{
+						"description": "Auto-switch to Default profile",
+						"manipulators": [
+							{
+								"conditions": [
+									{
+										"identifiers": [{ "is_built_in_keyboard": true }],
+										"type": "device_if"
+									}
+								],
+								"from": {
+									"any": "key_code",
+									"modifiers": { "optional": ["any"] }
+								},
+								"to": [
+									{
+										"shell_command": "/Library/Application\\ Support/org.pqrs/Karabiner-Elements/bin/karabiner_cli --select-profile 'Default profile'"
+									},
+									{ "from_event": true }
+								],
+								"type": "basic"
+							}
+						]
+					},
+					{
+						"description": "Claude Mac App: Enter for Newline, Cmd+Enter for Submit",
+						"manipulators": [
+							{
+								"conditions": [
+									{
+										"bundle_identifiers": [
+											"^com\\.anthropic\\.claudefordesktop$"
+										],
+										"type": "frontmost_application_if"
+									}
+								],
+								"description": "Command + Enter -> Enter (送信)",
+								"from": {
+									"key_code": "return_or_enter",
+									"modifiers": { "mandatory": ["command"] }
+								},
+								"to": [{ "key_code": "return_or_enter" }],
+								"type": "basic"
+							},
+							{
+								"conditions": [
+									{
+										"bundle_identifiers": [
+											"^com\\.anthropic\\.claudefordesktop$"
+										],
+										"type": "frontmost_application_if"
+									}
+								],
+								"description": "Enter -> Shift + Enter (改行)",
+								"from": {
+									"key_code": "return_or_enter",
+									"modifiers": { "optional": ["any"] }
+								},
+								"to": [
+									{
+										"key_code": "return_or_enter",
+										"modifiers": ["shift"]
+									}
+								],
+								"type": "basic"
+							}
+						]
+					}
+				]
+			},
+			"name": "Custom Keyboard",
+			"selected": true,
+			"virtual_hid_keyboard": { "keyboard_type_v2": "ansi" }
+		}
+	]
 }
