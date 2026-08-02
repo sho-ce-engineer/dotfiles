@@ -8,3 +8,6 @@ git/.config/git/**/*
 
 # Mac
 .DS_Store
+
+# karabiner-elementsのバックアップファイル
+karabiner/.config/karabiner/automatic_backups/

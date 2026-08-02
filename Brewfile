@@ -13,6 +13,7 @@ cask "1password", args: { appdir: "/Applications" }
 cask "brave-browser"
 cask "visual-studio-code"
 cask "obsidian"
+cask "karabiner-elements"
 
 # Fonts
 cask "font-hackgen-nerd"
