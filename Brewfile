@@ -14,6 +14,7 @@ cask "brave-browser"
 cask "visual-studio-code"
 cask "obsidian"
 cask "karabiner-elements" # pkgインストーラー形式のため appdir 指定は効かず、常に /Applications 固定
+cask "claude"
 
 # Fonts
 cask "font-hackgen-nerd"
