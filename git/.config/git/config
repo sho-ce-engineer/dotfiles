@@ -1,10 +1,11 @@
 [user]
         email = 293084588+sho-ce-engineer@users.noreply.github.com
         name = sho-ce-engineer
-	signingkey = ~/.ssh/github_sign.pub
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPj29NcjE3Sb8Ph3mMxdD6Ra2RT+RDEYlVzVjl9EN3jT
 [gpg]
 	format = ssh
 [commit]
 	gpgsign = true
 [gpg "ssh"]
 	allowedSignersFile = ~/.config/git/allowed_signers
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
