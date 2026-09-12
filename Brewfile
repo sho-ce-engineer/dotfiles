@@ -16,6 +16,7 @@ cask "obsidian"
 cask "karabiner-elements" # pkgインストーラー形式のため appdir 指定は効かず、常に /Applications 固定
 cask "claude"
 cask "claude-code"
+cask "hammerspoon"
 
 # Fonts
 cask "font-hackgen-nerd"

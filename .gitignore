@@ -11,3 +11,7 @@ git/.config/git/**/*
 
 # karabiner-elementsのバックアップファイル
 karabiner/.config/karabiner/automatic_backups/
+
+# Hammerspoonのサードパーティ製Spoon(インストール生成物)
+hammerspoon/.hammerspoon/Spoons/*
+!hammerspoon/.hammerspoon/Spoons/.gitkeep
