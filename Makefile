@@ -55,6 +55,12 @@ dotfiles:
 		echo "🧹 Removing empty Karabiner-Elements stub directory created by the installer..."; \
 		rm -rf ~/.config/karabiner; \
 	fi
+	@if [ -f ~/.hammerspoon/init.lua ] && [ ! -L ~/.hammerspoon/init.lua ] && [ ! -s ~/.hammerspoon/init.lua ]; then \
+		echo "🧹 Removing empty Hammerspoon init.lua stub created by the app..."; \
+		rm -f ~/.hammerspoon/init.lua; \
+	fi
+	@echo "🧹 Removing .DS_Store files that would conflict with Stow..."
+	@find . -name .DS_Store -not -path './.git/*' -delete
 	stow -v -t ~ -S $(STOW_PACKAGES)
 
 $(addprefix stow-,$(STOW_PACKAGES)): stow-%:
