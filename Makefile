@@ -3,6 +3,10 @@ SHELL=/bin/zsh
 
 STOW_PACKAGES := $(patsubst %/,%,$(wildcard */))
 
+# 1Password SSH Agent
+OP_SSH_SIGN := /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+OP_AGENT_SOCK := $(HOME)/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock
+
 # ==============================================================================
 # 📦 Target Management
 # ==============================================================================
@@ -77,49 +81,54 @@ mise: brew
 		echo "⚙️ mise is not installed. Please ensure 'mise' is in your Brewfile."; \
 	fi
 
-# GitHub Verified Settings.
+# GitHub Verified Settings (1Password SSH Agent).
+# git設定は git/.config/git/config に宣言済み（stowで配置）なので書き換えないこと。
 setup-signing:
-	@STATUS=$$(gh auth status -h github.com 2>&1 || true); \
-	if echo "$$STATUS" | grep -q "write:ssh_signing_key" && echo "$$STATUS" | grep -q "write:public_key"; then \
-		: ; \
-	elif echo "$$STATUS" | grep -q "Logged in to"; then \
-		gh auth refresh -h github.com -s write:ssh_signing_key,write:public_key; \
-	else \
-		gh auth login -h github.com -s write:ssh_signing_key,write:public_key; \
+	@echo "🔍 署名設定を検証します..."
+	@if [ ! -x "$(OP_SSH_SIGN)" ]; then \
+		echo "❌ op-ssh-sign が見つかりません: $(OP_SSH_SIGN)"; \
+		echo "   1Passwordをインストールし、設定 > 開発者 > SSH Agentを有効化してください。"; \
+		exit 1; \
 	fi
-	@if [ ! -f ~/.ssh/github_sign ]; then \
-		echo "🔑 Generating new SSH signing key..."; \
-		mkdir -p ~/.ssh && chmod 700 ~/.ssh; \
-		ssh-keygen -t ed25519 -C "293084588+sho-ce-engineer@users.noreply.github.com" -f ~/.ssh/github_sign -N ""; \
-		echo "🚀 Adding key to GitHub..."; \
-		gh ssh-key add ~/.ssh/github_sign.pub --type signing -t "Mac-Signing-Key"; \
-		echo "✅ 署名鍵の生成とGitHubへの登録が完了しました！"; \
+	@echo "✅ op-ssh-sign を確認しました。"
+	@if [ "$$SSH_AUTH_SOCK" = "$(OP_AGENT_SOCK)" ]; then \
+		echo "✅ SSH_AUTH_SOCK は1Password Agentを指しています。"; \
 	else \
-		echo "✅ Signing key already exists in local."; \
-		echo "🚀 Ensuring key is added to GitHub..."; \
-		set +e; \
-		ADD_OUTPUT=$$(gh ssh-key add ~/.ssh/github_sign.pub --type signing -t "Mac-Signing-Key" 2>&1); \
-		ADD_STATUS=$$?; \
-		set -e; \
-		if [ $$ADD_STATUS -ne 0 ]; then \
-			if echo "$$ADD_OUTPUT" | grep -qi "already in use"; then \
-				echo "✅ Already registered on GitHub. Skipping."; \
-			else \
-				echo "$$ADD_OUTPUT" >&2; \
-				exit 1; \
-			fi; \
-		else \
-			echo "$$ADD_OUTPUT"; \
-		fi; \
+		echo "⚠️  SSH_AUTH_SOCK が1Password Agentを指していません。"; \
+		echo "   'exec -l $$SHELL' でシェルを再読み込みしてください。"; \
 	fi
-	@echo "⚙️ Gitの署名設定を行います..."
-	@git config --global gpg.format ssh
-	@git config --global user.signingkey "~/.ssh/github_sign.pub"
-	@git config --global commit.gpgsign true
-	@mkdir -p ~/.config/git
-	@echo "$$(git config user.email) $$(cat ~/.ssh/github_sign.pub)" > ~/.config/git/allowed_signers
-	@git config --global gpg.ssh.allowedSignersFile "~/.config/git/allowed_signers"
-	@echo "🎉 すべての設定が完了しました！"
+	@SIGNING_KEY=$$(git config --get user.signingkey || true); \
+	if [ -z "$$SIGNING_KEY" ]; then \
+		echo "❌ user.signingkey が未設定です。'make stow-git' を実行してください。"; \
+		exit 1; \
+	fi; \
+	echo "🔑 署名鍵: $$(echo "$$SIGNING_KEY" | cut -c1-32)..."; \
+	if ssh-add -L 2>/dev/null | grep -qF "$$SIGNING_KEY"; then \
+		echo "✅ 署名鍵は1Password Agentにロードされています。"; \
+	else \
+		echo "⚠️  署名鍵が1Password Agentにありません。1Passwordのロック解除と、該当鍵のSSH Agent有効化を確認してください。"; \
+	fi; \
+	if grep -qF "$$SIGNING_KEY" ~/.config/git/allowed_signers 2>/dev/null; then \
+		echo "✅ allowed_signers に署名鍵が登録されています。"; \
+	else \
+		echo "⚠️  allowed_signers に署名鍵がありません。ローカルでの署名検証が 'U' になります。"; \
+	fi; \
+	STATUS=$$(gh auth status -h github.com 2>&1 || true); \
+	if ! echo "$$STATUS" | grep -q "Logged in to"; then \
+		gh auth login -h github.com -s write:ssh_signing_key; \
+	elif ! echo "$$STATUS" | grep -q "write:ssh_signing_key"; then \
+		gh auth refresh -h github.com -s write:ssh_signing_key; \
+	fi; \
+	if gh ssh-key list 2>/dev/null | grep -qF "$$SIGNING_KEY"; then \
+		echo "✅ 署名鍵はGitHubに登録済みです。"; \
+	else \
+		echo "🚀 署名鍵をGitHubに登録します..."; \
+		KEYFILE=$${TMPDIR:-/tmp}/signing_key.pub; \
+		printf '%s\n' "$$SIGNING_KEY" > "$$KEYFILE"; \
+		gh ssh-key add "$$KEYFILE" --type signing -t "1Password-Signing-Key"; \
+		rm -f "$$KEYFILE"; \
+	fi
+	@echo "🎉 検証が完了しました！"
 
 defaults:
 	@echo "Configuring macOS Dock and Hot Corners..."
