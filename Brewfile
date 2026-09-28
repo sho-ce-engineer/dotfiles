@@ -17,6 +17,7 @@ cask "karabiner-elements" # pkgインストーラー形式のため appdir 指�
 cask "claude"
 cask "claude-code"
 cask "hammerspoon"
+cask "appcleaner"
 
 # Fonts
 cask "font-hackgen-nerd"

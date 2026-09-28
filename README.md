@@ -63,3 +63,8 @@ git restore karabiner/.config/karabiner/karabiner.json
 Karabinerはスペース4つで書き出すが、コミット済みの版はタブインデントのため、
 毎回ファイル全体（約320行）が差分として現れる。
 差分を`selected`の1〜2行だけに縮めたい場合は、スペース4つ版を一度コミットし直すこと。
+
+## 番外
+ELECOM Hugeマウスの設定用アプリはbrew対応していないため、手動でDLしインストールする必要がある。
+設定は`~/other/ELECOMMOUSE.json`に格納されているため、インポートして使用
+エレコムマウスアシスタント:https://www.elecom.co.jp/support/download/peripheral/mouse/assistant/
