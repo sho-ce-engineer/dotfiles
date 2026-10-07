@@ -3,5 +3,8 @@ instance_eval(File.read(File.dirname(__FILE__) + "/Brewfile"))
 # Applications
 cask "slack"
 cask "gather"
+cask "cloudflare-warp" # pkgインストーラー形式のため appdir 指定は効かず、常に /Applications 固定
+cask "docker-desktop", args: { appdir: "/Applications" }
+cask "notion"
 
 # Fonts
