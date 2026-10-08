@@ -43,6 +43,18 @@ gh auth status
 シンボリックリンクのため、`git config --global` での設定変更はリポジトリ本体を
 書き換えてしまいます。git設定は `git/.config/git/config` を直接編集してください。
 
+## STEP3:手動で設定する項目
+### macOSの設定
+以下は `defaults` では反映が安定しないため、`make defaults` の後にシステム設定から手動で行う。
+
+- **音声入力**：`システム設定 > キーボード > 音声入力` をオンにし、ショートカットを「Controlキーを2回押す」にする
+- **入力ソース**：`システム設定 > キーボード > 入力ソース` に「ABC」と「日本語 - ローマ字入力」を追加する
+
+### ELECOM Hugeマウス
+ELECOM Hugeマウスの設定用アプリはbrew対応していないため、手動でDLしインストールする必要がある。
+設定は`~/dotfiles/other/ELECOMMOUSE.json`に格納されているため、インポートして使用
+エレコムマウスアシスタント:https://www.elecom.co.jp/support/download/peripheral/mouse/assistant/
+
 ---
 ## 注意
 ### karabiner.json の差分について
@@ -63,8 +75,3 @@ git restore karabiner/.config/karabiner/karabiner.json
 Karabinerはスペース4つで書き出すが、コミット済みの版はタブインデントのため、
 毎回ファイル全体（約320行）が差分として現れる。
 差分を`selected`の1〜2行だけに縮めたい場合は、スペース4つ版を一度コミットし直すこと。
-
-## 番外
-ELECOM Hugeマウスの設定用アプリはbrew対応していないため、手動でDLしインストールする必要がある。
-設定は`~/other/ELECOMMOUSE.json`に格納されているため、インポートして使用
-エレコムマウスアシスタント:https://www.elecom.co.jp/support/download/peripheral/mouse/assistant/
