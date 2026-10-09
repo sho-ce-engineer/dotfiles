@@ -11,7 +11,7 @@ OP_AGENT_SOCK := $(HOME)/Library/Group Containers/2BUA8C4S2C.com.1password/t/age
 # 📦 Target Management
 # ==============================================================================
 # Targets to exclude from the automatic setup execution (default `make` command)
-EXCLUDE_TARGETS := all work brew-work setup-signing defaults
+EXCLUDE_TARGETS := all work brew-work setup-signing defaults dock dock-work
 
 # Convert the space-separated list into a regex pattern (e.g., all|work|brew-work)
 EXCLUDE_REGEX := $(shell echo "$(EXCLUDE_TARGETS)" | sed 's/ /|/g')
@@ -176,3 +176,49 @@ defaults:
 
 	killall Dock
 	@echo "macOS defaults applied successfully!"
+
+# Dock apps: 上から順にDockへ並ぶ。/Applications と ~/Applications の使い分けはBrewfile準拠
+define DOCK_COMMON
+/System/Applications/Calendar.app
+/System/Applications/Calculator.app
+$(HOME)/Applications/Ghostty.app
+$(HOME)/Applications/Claude.app
+$(HOME)/Applications/Brave Browser.app
+$(HOME)/Applications/Obsidian.app
+$(HOME)/Applications/Visual Studio Code.app
+endef
+
+define DOCK_PRIVATE
+/Applications/Microsoft To Do.app
+/Applications/LINE.app
+$(HOME)/Applications/Discord.app
+endef
+
+define DOCK_WORK
+$(HOME)/Applications/Slack.app
+$(HOME)/Applications/Gather.app
+$(HOME)/Applications/Notion.app
+/Applications/Docker.app
+endef
+export DOCK_COMMON DOCK_PRIVATE DOCK_WORK
+
+# 標準入力のパス一覧をDockのpersistent-appsへ置き換える。存在しないアプリはスキップ
+define DOCK_APPLY
+defaults write com.apple.dock persistent-apps -array; \
+while IFS= read -r app; do \
+	[ -z "$$app" ] && continue; \
+	if [ ! -d "$$app" ]; then echo "⚠️  skip (not installed): $$app"; continue; fi; \
+	defaults write com.apple.dock persistent-apps -array-add "<dict><key>tile-data</key><dict><key>file-data</key><dict><key>_CFURLString</key><string>$$app</string><key>_CFURLStringType</key><integer>0</integer></dict></dict></dict>"; \
+done; \
+killall Dock
+endef
+
+# Dock (私用): 共通 + 私用
+dock:
+	@printf '%s\n%s\n' "$$DOCK_COMMON" "$$DOCK_PRIVATE" | { $(DOCK_APPLY) ; }
+	@echo "Dock configured (private)."
+
+# Dock (仕事用): 共通 + 仕事用
+dock-work:
+	@printf '%s\n%s\n' "$$DOCK_COMMON" "$$DOCK_WORK" | { $(DOCK_APPLY) ; }
+	@echo "Dock configured (work)."

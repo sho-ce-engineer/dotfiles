@@ -18,6 +18,10 @@ exec -l $SHELL
 # Run defaults
 make defaults
 
+# Set Dock apps (private: common + private / work: common + work)
+make dock
+make dock-work
+
 ```
 
 ##  STEP2:GitHub Verified Setting.
