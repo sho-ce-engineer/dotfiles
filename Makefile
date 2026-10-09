@@ -54,7 +54,7 @@ brew-cleanup:
 
 # Deploy all dotfile packages with GNU Stow
 dotfiles:
-	mkdir -p ~/.config
+	mkdir -p ~/.config ~/.claude
 	@if [ -d ~/.config/karabiner ] && [ ! -L ~/.config/karabiner ] && [ ! -e ~/.config/karabiner/karabiner.json ]; then \
 		echo "🧹 Removing empty Karabiner-Elements stub directory created by the installer..."; \
 		rm -rf ~/.config/karabiner; \
@@ -66,6 +66,20 @@ dotfiles:
 	@echo "🧹 Removing .DS_Store files that would conflict with Stow..."
 	@find . -name .DS_Store -not -path './.git/*' -delete
 	stow -v -t ~ -S $(STOW_PACKAGES)
+	@set -- "$$HOME/.claude/AGENTS.md" "$$HOME/.claude/CLAUDE.md"; \
+	if command -v codex > /dev/null || [ -d $$HOME/.codex ]; then \
+		mkdir -p $$HOME/.codex; \
+		set -- "$$@" "$$HOME/.codex/AGENTS.md"; \
+	else \
+		echo "Codex is not installed. Skipping ~/.codex link."; \
+	fi; \
+	for dest in "$$@"; do \
+		if [ -e "$$dest" ] && [ ! -L "$$dest" ]; then \
+			echo "⚠️ $$dest exists as a regular file. Skipping symlink."; \
+		else \
+			ln -sfn "$$HOME/.config/agents/$$(basename $$dest)" "$$dest"; \
+		fi; \
+	done
 
 $(addprefix stow-,$(STOW_PACKAGES)): stow-%:
 	stow -v -t ~ -S $*
